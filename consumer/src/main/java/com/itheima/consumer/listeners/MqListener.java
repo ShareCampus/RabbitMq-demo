@@ -14,9 +14,10 @@ import java.util.Map;
 @Component
 public class MqListener {
 
-    @RabbitListener(queues = "simple.queue")
+    // @RabbitListener(queues = "simple.queue")
     public void listenSimpleQueue(String msg){
         System.out.println("消费者收到了simple.queue的消息：【" + msg +"】");
+        throw new RuntimeException("故意的");
     }
 
     @RabbitListener(queues = "work.queue")
@@ -53,7 +54,7 @@ public class MqListener {
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(name = "direct.queue2", durable = "true"),
             exchange = @Exchange(name = "hmall.direct", type = ExchangeTypes.DIRECT),
-            key = {"blue"}
+            key = {"red", "yellow"}
     ))
     public void listenDirectQueue2(String msg) throws InterruptedException {
         System.out.println("消费者2 收到了 direct.queue2的消息：【" + msg +"】");
@@ -72,5 +73,19 @@ public class MqListener {
     @RabbitListener(queues = "object.queue")
     public void listenObject(Map<String, Object> msg) throws InterruptedException {
         System.out.println("消费者 收到了 object.queue的消息：【" + msg +"】");
+    }
+
+    @RabbitListener(queues = "dlx.queue")
+    public void listenDlxQueue(String msg){
+        log.info("dlx.queue的消息：【" + msg +"】");
+    }
+
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(value = "delay.queue", durable = "true"),
+            exchange = @Exchange(value = "delay.direct", delayed = "true"),
+            key = "hi"
+    ))
+    public void listenDelayQueue(String msg){
+        log.info("接收到delay.queue的消息：{}", msg);
     }
 }
